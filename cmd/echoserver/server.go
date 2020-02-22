@@ -1,4 +1,4 @@
-package echoserver
+package main
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 
 type server struct{}
 
-func New() *server {
+func NewEchoServer() *server {
 	s := &server{}
 	return s
 }
