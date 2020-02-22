@@ -22,3 +22,23 @@ build/%: APP_NAME = $*
 build/%: cmd/%
 	@mkdir -p build
 	go build -o $@ -ldflags ${KIT_VERSION} ./$<
+
+
+
+launch-osqueryd: export ENROLL_SECRET=secret
+launch-osqueryd:
+	osqueryd --verbose --ephemeral --disable_database \
+	--tls_hostname localhost:4433 \
+	--tls_server_certs build/server.crt \
+	--config_plugin tls \
+	--enroll_tls_endpoint /enroll \
+	--logger_plugin tls \
+	--logger_tls_endpoint /log \
+	--config_tls_endpoint /config \
+	--enroll_secret_env ENROLL_SECRET
+
+
+build/server.crt:
+	openssl req -x509 -subj '/CN=localhost' \
+	  -newkey rsa:2048  -nodes -days 365 \
+	  -keyout build/server.key -out build/server.crt
